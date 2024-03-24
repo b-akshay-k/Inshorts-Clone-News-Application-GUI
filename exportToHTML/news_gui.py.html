@@ -1,0 +1,99 @@
+<html>
+<head>
+<title>news_gui.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #8c8c8c; font-style: italic;}
+.s3 { color: #067d17;}
+.s4 { color: #1750eb;}
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+news_gui.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">webbrowser</span>
+<span class="s0">import </span><span class="s1">io</span>
+<span class="s0">import </span><span class="s1">requests</span>
+<span class="s0">from </span><span class="s1">tkinter </span><span class="s0">import </span><span class="s1">*</span>
+<span class="s0">from </span><span class="s1">urllib.request </span><span class="s0">import </span><span class="s1">urlopen</span>
+<span class="s0">from </span><span class="s1">PIL </span><span class="s0">import </span><span class="s1">ImageTk, Image</span>
+
+<span class="s0">class </span><span class="s1">NewsApp:</span>
+    <span class="s0">def </span><span class="s1">__init__(self):</span>
+        <span class="s2">## fetch data</span>
+        <span class="s1">self.data = requests.get(</span><span class="s3">'https://newsapi.org/v2/top-headlines?country=in&amp;apiKey=e210203cb15048148434bd2204cf780f'</span><span class="s1">).json()</span>
+        <span class="s2">## initial GUI Load</span>
+        <span class="s1">self.load_gui()</span>
+        <span class="s1">self.load_news_item(</span><span class="s4">0</span><span class="s1">)  </span><span class="s2"># Calling instance method using self</span>
+        <span class="s1">self.root.mainloop()</span>
+
+    <span class="s0">def </span><span class="s1">load_gui(self):</span>
+        <span class="s1">self.root = Tk()</span>
+        <span class="s1">self.root.geometry(</span><span class="s3">'350x600'</span><span class="s1">)</span>
+        <span class="s1">self.root.resizable(</span><span class="s4">0</span><span class="s1">,</span><span class="s4">0</span><span class="s1">)</span>
+        <span class="s1">self.root.configure(background=</span><span class="s3">'maroon'</span><span class="s1">)</span>
+
+    <span class="s0">def </span><span class="s1">clear(self):</span>
+        <span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">self.root.pack_slaves():</span>
+            <span class="s1">i.destroy()</span>
+
+    <span class="s0">def </span><span class="s1">load_news_item(self, index):</span>
+        <span class="s2"># clear the screen for next new news item</span>
+        <span class="s1">self.clear()</span>
+        <span class="s2"># placing the image</span>
+        <span class="s0">try</span><span class="s1">:</span>
+            <span class="s1">img_url = self.data[</span><span class="s3">'articles'</span><span class="s1">][index][</span><span class="s3">'urlToImage'</span><span class="s1">]</span>
+            <span class="s1">raw_data = urlopen(img_url).read()</span>
+            <span class="s1">im = Image.open(io.BytesIO(raw_data)).resize((</span><span class="s4">350</span><span class="s1">, </span><span class="s4">250</span><span class="s1">))</span>
+            <span class="s1">self.photo = ImageTk.PhotoImage(im)</span>
+        <span class="s0">except</span><span class="s1">:</span>
+
+            <span class="s1">img_url = </span><span class="s3">&quot;https://images.wondershare.com/repairit/aticle/2021/07/resolve-images-not-showing-problem-1.jpg&quot;</span>
+            <span class="s1">raw_data = urlopen(img_url).read()</span>
+            <span class="s1">im = Image.open(io.BytesIO(raw_data)).resize((</span><span class="s4">350</span><span class="s1">, </span><span class="s4">250</span><span class="s1">))</span>
+            <span class="s1">self.photo = ImageTk.PhotoImage(im)</span>
+
+
+        <span class="s1">label = Label(self.root, image=self.photo)</span>
+        <span class="s1">label.pack()</span>
+
+        <span class="s1">heading = Label(self.root, text=self.data[</span><span class="s3">'articles'</span><span class="s1">][index][</span><span class="s3">'title'</span><span class="s1">], background=</span><span class="s3">'maroon'</span><span class="s1">, foreground=</span><span class="s3">'white'</span><span class="s1">,</span>
+                        <span class="s1">wraplength=</span><span class="s4">350</span><span class="s1">, justify=</span><span class="s3">'center'</span><span class="s1">)</span>
+        <span class="s1">heading.pack(pady=(</span><span class="s4">10</span><span class="s1">, </span><span class="s4">20</span><span class="s1">))</span>
+        <span class="s1">heading.config(font=(</span><span class="s3">'verdana'</span><span class="s1">, </span><span class="s4">15</span><span class="s1">))</span>
+
+        <span class="s1">details = Label(self.root, text=self.data[</span><span class="s3">'articles'</span><span class="s1">][index][</span><span class="s3">'description'</span><span class="s1">], background=</span><span class="s3">'maroon'</span><span class="s1">,</span>
+                        <span class="s1">foreground=</span><span class="s3">'white'</span><span class="s1">,</span>
+                        <span class="s1">wraplength=</span><span class="s4">350</span><span class="s1">, justify=</span><span class="s3">'center'</span><span class="s1">)</span>
+        <span class="s1">details.pack(pady=(</span><span class="s4">2</span><span class="s1">, </span><span class="s4">20</span><span class="s1">))</span>
+        <span class="s1">details.config(font=(</span><span class="s3">'verdana'</span><span class="s1">, </span><span class="s4">12</span><span class="s1">))</span>
+
+        <span class="s1">frame = Frame(self.root, bg=</span><span class="s3">'maroon'</span><span class="s1">)</span>
+        <span class="s1">frame.pack(expand=</span><span class="s0">True</span><span class="s1">, fill=BOTH)</span>
+
+        <span class="s0">if </span><span class="s1">index !=</span><span class="s4">0</span><span class="s1">:</span>
+            <span class="s1">prev = Button(frame, text=</span><span class="s3">'Previous Article'</span><span class="s1">, width=</span><span class="s4">16</span><span class="s1">, height=</span><span class="s4">3</span><span class="s1">, background=</span><span class="s3">'white'</span><span class="s1">, foreground=</span><span class="s3">'maroon'</span><span class="s1">,</span>
+                      <span class="s1">command=</span><span class="s0">lambda</span><span class="s1">:self.load_news_item(index-</span><span class="s4">1</span><span class="s1">))</span>
+            <span class="s1">prev.pack(side=LEFT)</span>
+
+        <span class="s1">read = Button(frame, text=</span><span class="s3">'Read More'</span><span class="s1">, width=</span><span class="s4">16</span><span class="s1">, height=</span><span class="s4">3</span><span class="s1">, background=</span><span class="s3">'white'</span><span class="s1">, foreground=</span><span class="s3">'maroon'</span><span class="s1">,</span>
+                      <span class="s1">command=</span><span class="s0">lambda</span><span class="s1">:self.open_link(self.data[</span><span class="s3">'articles'</span><span class="s1">][index][</span><span class="s3">'url'</span><span class="s1">]))</span>
+        <span class="s1">read.pack(side=LEFT)</span>
+
+        <span class="s0">if </span><span class="s1">index!=len(self.data[</span><span class="s3">'articles'</span><span class="s1">]) - </span><span class="s4">1</span><span class="s1">:</span>
+            <span class="s1">next = Button(frame, text=</span><span class="s3">'Next Article'</span><span class="s1">, width=</span><span class="s4">16</span><span class="s1">, height=</span><span class="s4">3</span><span class="s1">, background=</span><span class="s3">'white'</span><span class="s1">, foreground=</span><span class="s3">'maroon'</span><span class="s1">,</span>
+                      <span class="s1">command=</span><span class="s0">lambda</span><span class="s1">:self.load_news_item(index+</span><span class="s4">1</span><span class="s1">) )</span>
+            <span class="s1">next.pack(side=LEFT)</span>
+
+    <span class="s0">def </span><span class="s1">open_link(self, url):</span>
+        <span class="s1">webbrowser.open(url)</span>
+
+        <span class="s1">self.root.mainloop()</span>
+<span class="s1">obj = NewsApp()</span></pre>
+</body>
+</html>
